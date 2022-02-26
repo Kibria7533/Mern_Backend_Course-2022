@@ -1,55 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const crudModel = require("../models/crud");
+const {Add,deleteController,updateController,getSingle,getAll}= require('../Controller/CrudController');
+const { fromCeck } = require("../Middleware/crudMiddle");
+const { body } = require('express-validator')
 
-router.get("/show", async (req, res) => {
-  let data = await crudModel.find();
-  res.send(data);
-});
+router.get("/show",getAll);
 
+router.get("/showSIngle/:id", getSingle);
 
-router.get("/showSIngle/:id", async (req, res) => {
-  let data = await crudModel.findOne({ _id: req.params.id});
-  res.send(data);
-});
-router.post("/save", async (req, res) => {
-  console.log(req.body);
+router.post("/save",
+body('title').not().isEmpty().withMessage("Title  is required."),
+body('author').isLength({ min: 3 }).withMessage("Author name cant be less than three characters"),
+fromCeck,Add);
 
-  const cr = new crudModel({
-    title: req.body.title,
-    author: req.body.author,
-    body: req.body.body,
-  });
+router.delete("/delete/:id", deleteController);
 
-  try {
-    const a1 = await cr.save();
-    res.json(a1);
-  } catch (err) {
-    res.send("Error");
-  }
-});
-
-router.delete("/delete/:id", async (req, res) => {
-  console.log(req.params.id);
-  let data = await crudModel.deleteOne({ _id: req.params.id });
-  res.send({ msg: "deleted", data: data });
-});
-
-router.post("/update/:id", async (req, res) => {
-  console.log(req.params.id, req.body);
-
-  try {
-    let up = await crudModel.findByIdAndUpdate({_id:req.params.id},{
-      title: req.body.title,
-      author: req.body.author,
-      body: req.body.body,
-    });
-
-
-    res.send({ info: "updated" ,up: up});
-  } catch (err) {
-    res.send({ info: "error ocuured" });
-  }
-});
+router.post("/update/:id", updateController);
 
 module.exports = router;

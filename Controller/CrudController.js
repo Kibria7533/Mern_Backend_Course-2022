@@ -1,4 +1,5 @@
 const crudModel = require("../models/crud");
+const UserModel = require("../models/user");
 const Add=async (req, res) => {  
     const cr = new crudModel({
       title: req.body.title,
@@ -8,7 +9,18 @@ const Add=async (req, res) => {
   
     try {
       const a1 = await cr.save();
-      res.json({success:true, message: 'Succesfully added' });
+      console.log(req.id,'dfsd')
+      await UserModel.updateOne({
+        _id: req.id
+      }, {
+        $push: {
+          crud: a1._id
+        }
+      });
+
+
+
+      res.json({success:true, message: 'Succesfully added crud' });
     } catch (err) {
       res.send("Error");
     }
@@ -42,8 +54,9 @@ const getSingle=async (req, res) => {
     res.send(data);
   }
 const getAll= async (req, res) => {
+  console.log(req.data,req.id)
     let data = await crudModel.find();
-    res.send(data);
+    res.send({j:data,l:req.data});
   }
   module.exports={
       Add,

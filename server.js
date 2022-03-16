@@ -17,7 +17,9 @@ con.on('open', () => {
 app.use(cors())
 
 const routes=require('./routes/crudRoute')
+const userroute=require('./routes/userRoute')
 app.use('/api',routes)
+app.use('/user',userroute)
 
 app.listen(process.env.PORT || 4000,()=>{
     console.log('server is running hurreh')
